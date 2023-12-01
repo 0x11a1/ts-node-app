@@ -1,4 +1,4 @@
-export interface IBucketTx {
+export interface Types {
     id: string;
     pid: string;
     symbol: string;

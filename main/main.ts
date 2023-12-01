@@ -5,5 +5,5 @@ import {kai} from "@/_4everland/kai";
 // });
 
 // ping("bytes");
-kai("bytes");
+kai("bytes").then();
 // listBuckets();

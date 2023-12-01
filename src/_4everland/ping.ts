@@ -2,8 +2,8 @@ import mysql from "mysql2/promise";
 import {config} from "@/mysql/config";
 import {s3} from "./s3";
 import {HeadObjectCommandOutput} from "@aws-sdk/client-s3";
-import {IBucketTx} from "@/types/IBucketTx";
-import {IMG_SRC} from "@/consts/ImgSrc";
+import {Types} from "@/_4everland/types";
+import {IMG_SRC} from "@/consts/imgSrc";
 import dayjs from "dayjs";
 export const ping = async (bucketName: string) => {
     const conn = await mysql.createConnection(config);
@@ -61,7 +61,7 @@ export const ping = async (bucketName: string) => {
                 "仅供学习参考，不构成投资建议❗\n" +
                 "在区块链上记录每一笔交易🐸";
 
-            const data: IBucketTx = {
+            const data: Types = {
                 id: dd.algo_cl_ord_id,
                 pid: dd.cl_ord_id,
                 symbol: IMG_SRC[symbol.toLowerCase()][0],

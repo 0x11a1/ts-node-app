@@ -13,6 +13,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.462.0",
     "dayjs": "^1.11.10",
+    "discord.js-selfbot-v13": "^2.15.0",
     "dotenv": "^16.3.1",
     "https-proxy-agent": "^7.0.2",
     "mysql2": "^3.6.5",
