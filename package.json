@@ -14,7 +14,10 @@
     "@aws-sdk/client-s3": "^3.462.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
-    "mysql2": "^3.6.5"
+    "https-proxy-agent": "^7.0.2",
+    "mysql2": "^3.6.5",
+    "node-global-proxy": "^1.0.1",
+    "socks-proxy-agent": "^8.0.2"
   },
   "devDependencies": {
     "@tsconfig/node16": "^16.1.1",

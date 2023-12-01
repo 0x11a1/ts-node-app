@@ -1,9 +1,9 @@
 import mysql from "mysql2/promise";
-import {config} from "../mysql/config";
+import {config} from "@/mysql/config";
 import {s3} from "./s3";
 import {HeadObjectCommandOutput} from "@aws-sdk/client-s3";
-import {IBucketTx} from "../../types/IBucketTx";
-import {IMG_SRC} from "../../constants/ImgSrc";
+import {IBucketTx} from "@/types/IBucketTx";
+import {IMG_SRC} from "@/consts/ImgSrc";
 import dayjs from "dayjs";
 export const ping = async (bucketName: string) => {
     const conn = await mysql.createConnection(config);
