@@ -1,5 +1,3 @@
-import {Config} from "@/discord/config";
+import {getConfig} from "./config";
 
-export let config: Config|undefined = undefined
-
-console.log(config)
+console.log(getConfig());

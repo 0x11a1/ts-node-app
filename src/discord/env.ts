@@ -1,10 +1,7 @@
 import dotenv from "dotenv";
 
-export interface Env {
-    TS_NODE_DISCORD_TOKEN: string;
-}
+dotenv.config();
 
-export function getEnv(): Env {
-    dotenv.config();
-    return process.env as unknown as Env;
+export function getEnv(name?: string): string {
+    return name ? process.env[name] ?? "" : "";
 }
