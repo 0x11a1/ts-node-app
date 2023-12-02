@@ -5,36 +5,52 @@ import {
     MessageEmbed,
     Snowflake,
 } from "discord.js-selfbot-v13";
-import {getConfig} from "./config";
+import {conf, webhookMap} from "./conf";
 import {formatSize} from "@/utils";
+import dayjs from "dayjs";
 
 export const onMessageCreate = async (message: Message) => {
-    const config = getConfig();
-
-    console.log("🌻message.guildId", message.guildId);
-    console.log("🌻message.channelId", message.channelId);
-
-    if (
-        config.allowedGuildsIds &&
-        config.allowedChannelsIds &&
-        message.guildId &&
-        message.channelId &&
-        config.allowedGuildsIds.includes(message.guildId) &&
-        config.allowedChannelsIds.includes(message.channelId)
-    ) {
+    if (message.guildId && message.channelId && conf.inChannels.includes(message.channelId)) {
         let render = "";
         render += message.content;
         const [strEmbeds, embedImages] = handleEmbeds(message.embeds);
 
         if (strEmbeds.length != 0) render += strEmbeds.join("");
 
-        const [strAttachments, attachImages] = handleAttachments(
-            message.attachments
-        );
+        const [strAttachments, attachImages] = handleAttachments(message.attachments);
 
         if (strAttachments.length != 0) render += strAttachments.join("");
         const images = embedImages.concat(attachImages);
         console.log(render);
+
+        for (const ioMap of conf.inOut) {
+            if (ioMap.hasOwnProperty(message.channelId)) {
+                ioMap[message.channelId].forEach((item) => {
+                    const webhook = webhookMap[item];
+
+                    if (webhook) {
+                        webhook.send({
+                            content: message.content,
+                            attachments: message.attachments.map((item) => {
+                                return {
+                                    id: dayjs().unix().toString(),
+                                    attachment: item.attachment,
+                                    name: item.name,
+                                    size: item.size,
+                                    url: item.url,
+                                    proxyURL: item.proxyURL,
+                                    height: item.height,
+                                    width: item.width,
+                                    contentType: item.contentType,
+                                    description: item.description,
+                                } as MessageAttachment;
+                            }),
+                            embeds: message.embeds,
+                        });
+                    }
+                });
+            }
+        }
     }
 };
 
@@ -45,14 +61,11 @@ const handleAttachments = (
     const images: string[] = [];
 
     attachments.forEach((attachment) => {
-        if (attachment.contentType?.startsWith("image"))
-            return images.push(attachment.url);
+        if (attachment.contentType?.startsWith("image")) return images.push(attachment.url);
 
         strAttachments.push(
             `Attachment:\n  Name: ${attachment.name}\n${
-                attachment.description
-                    ? `	Description: ${attachment.description}\n`
-                    : ""
+                attachment.description ? `	Description: ${attachment.description}\n` : ""
             }  Size: ${formatSize(attachment.size)}\n  Url: ${attachment.url}`
         );
     });
@@ -66,8 +79,7 @@ const handleEmbeds = (embeds: MessageEmbed[]): [string[], string[]] => {
         let stringEmbed = "Embed:\n";
 
         if (embed.title) stringEmbed += `  Title: ${embed.title}\n`;
-        if (embed.description)
-            stringEmbed += `  Description: ${embed.description}\n`;
+        if (embed.description) stringEmbed += `  Description: ${embed.description}\n`;
         if (embed.url) stringEmbed += `  Url: ${embed.url}\n`;
         if (embed.color) stringEmbed += `  Color: ${embed.color}\n`;
         if (embed.timestamp) stringEmbed += `  Url: ${embed.timestamp}\n`;
@@ -84,8 +96,7 @@ const handleEmbeds = (embeds: MessageEmbed[]): [string[], string[]] => {
         });
 
         if (allFields.length != 1) stringEmbed += `${allFields.join("")}`;
-        if (embed.thumbnail)
-            stringEmbed += `  Thumbnail: ${embed.thumbnail.url}\n`;
+        if (embed.thumbnail) stringEmbed += `  Thumbnail: ${embed.thumbnail.url}\n`;
         if (embed.image) {
             stringEmbed += `  Image: ${embed.image.url}\n`;
             images.push(embed.image.url);

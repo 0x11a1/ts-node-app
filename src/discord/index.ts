@@ -1,5 +1,5 @@
 import {globalProxy, newSelfBot} from "./client";
-import {getConfig} from "./config";
+import {getConfig} from "./conf";
 import {getEnv} from "./env";
 import {onReady} from "./onReady";
 import {onMessageCreate} from "./onMessageCreate";

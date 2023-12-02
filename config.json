@@ -1,15 +1,16 @@
 {
-  "tokenEnvName": "TS_NODE_DISCORD_TIA_USER_TOKEN_TEST",
-  "httpProxy": "http://127.0.0.1:7890",
-  "outputChannels": [
-    "-1002056369804"
-  ],
-  "allowedGuildsIds": [
-    "870528887334002739",
-    "1179052512435781652"
-  ],
-  "allowedChannelsIds": [
-    "1016095150549762048",
-    "1179052513274638338"
-  ]
+    "tokenEnvName": "TS_NODE_DISCORD_TIA_USER_TOKEN_TEST",
+    "httpProxy": "http://127.0.0.1:7890",
+    "socksProxy": "socks://127.0.0.1:7890",
+    "inOut": [
+        {
+            "1179052513274638338": ["1180285405413777499"]
+        },
+        {
+            "1016095150549762048": ["1180285405413777499"]
+        }
+    ],
+    "outputChannels": ["-1002056369804"],
+    "allowedGuildsIds": ["870528887334002739", "1179052512435781652"],
+    "allowedChannelsIds": ["1016095150549762048", "1179052513274638338"]
 }
