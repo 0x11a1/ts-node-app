@@ -29,44 +29,16 @@ export const onMessageCreate = async (message: Message) => {
 };
 
 const webhookSend = async (message: Message) => {
+    // const attachments: MessageAttachment[] = [];
+    // for (const item of message.attachments.values()) {
+    //     attachments.push(item);
+    // }
+
+    const attachments = message.attachments.map((item) => item);
+
     for (const m of conf.inOut) {
         if (!m.hasOwnProperty(message.channelId)) {
             continue;
-        }
-        const attachments: MessageAttachment[] = [];
-        for (const item of message.attachments.values()) {
-            console.log("attachment", item.attachment);
-            console.log("url", item.url);
-            console.log("proxyURL", item.proxyURL);
-
-            attachments.push(item);
-
-            // attachments.push(
-            //     new MessageAttachment(item.url, item.name ?? "", {
-            //         id: item.id,
-            //         filename: item.name ?? "",
-            //         size: item.size,
-            //         url: item.url,
-            //         proxy_url: item.proxyURL,
-            //     })
-            // );
-
-            // const agent = new SocksProxyAgent("socks://127.0.0.1:7890");
-            //
-            // try {
-            //     const res = await superagent.get(item.url).agent(agent);
-            //     attachments.push(
-            //         new MessageAttachment(res.body, item.name ?? "", {
-            //             id: dayjs().millisecond() + "",
-            //             filename: item.name ?? "",
-            //             size: item.size,
-            //             url: item.url,
-            //             proxy_url: item.proxyURL,
-            //         })
-            //     );
-            // } catch (err) {
-            //     console.error(err);
-            // }
         }
 
         for (const outId of m[message.channelId]) {
@@ -78,9 +50,9 @@ const webhookSend = async (message: Message) => {
             const res = await webhook.send({
                 content: message.content,
                 files: attachments,
-                username: message.author.username,
+                username: message.author.globalName ?? message.author.username,
                 avatarURL: message.author.avatarURL() ?? "",
-                embeds: message.embeds,
+                // embeds: message.embeds,
             });
             console.log(res);
         }
