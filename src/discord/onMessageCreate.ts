@@ -52,7 +52,7 @@ const webhookSend = async (message: Message) => {
                 files: attachments,
                 username: message.author.globalName ?? message.author.username,
                 avatarURL: message.author.avatarURL() ?? "",
-                // embeds: message.embeds,
+                embeds: message.embeds,
             });
             console.log(res);
         }
