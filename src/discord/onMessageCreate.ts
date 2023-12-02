@@ -7,6 +7,8 @@ import {
 } from "discord.js-selfbot-v13";
 import {conf, webhookMap} from "./conf";
 import {formatSize} from "@/utils";
+import {SocksProxyAgent} from "socks-proxy-agent";
+import superagent from "superagent";
 import dayjs from "dayjs";
 
 export const onMessageCreate = async (message: Message) => {
@@ -22,34 +24,65 @@ export const onMessageCreate = async (message: Message) => {
         if (strAttachments.length != 0) render += strAttachments.join("");
         const images = embedImages.concat(attachImages);
         console.log(render);
+        webhookSend(message);
+    }
+};
 
-        for (const ioMap of conf.inOut) {
-            if (ioMap.hasOwnProperty(message.channelId)) {
-                ioMap[message.channelId].forEach((item) => {
-                    const webhook = webhookMap[item];
+const webhookSend = async (message: Message) => {
+    for (const m of conf.inOut) {
+        if (!m.hasOwnProperty(message.channelId)) {
+            continue;
+        }
+        const attachments: MessageAttachment[] = [];
+        for (const item of message.attachments.values()) {
+            console.log("attachment", item.attachment);
+            console.log("url", item.url);
+            console.log("proxyURL", item.proxyURL);
 
-                    if (webhook) {
-                        webhook.send({
-                            content: message.content,
-                            attachments: message.attachments.map((item) => {
-                                return {
-                                    id: dayjs().unix().toString(),
-                                    attachment: item.attachment,
-                                    name: item.name,
-                                    size: item.size,
-                                    url: item.url,
-                                    proxyURL: item.proxyURL,
-                                    height: item.height,
-                                    width: item.width,
-                                    contentType: item.contentType,
-                                    description: item.description,
-                                } as MessageAttachment;
-                            }),
-                            embeds: message.embeds,
-                        });
-                    }
-                });
+            attachments.push(item);
+
+            // attachments.push(
+            //     new MessageAttachment(item.url, item.name ?? "", {
+            //         id: item.id,
+            //         filename: item.name ?? "",
+            //         size: item.size,
+            //         url: item.url,
+            //         proxy_url: item.proxyURL,
+            //     })
+            // );
+
+            // const agent = new SocksProxyAgent("socks://127.0.0.1:7890");
+            //
+            // try {
+            //     const res = await superagent.get(item.url).agent(agent);
+            //     attachments.push(
+            //         new MessageAttachment(res.body, item.name ?? "", {
+            //             id: dayjs().millisecond() + "",
+            //             filename: item.name ?? "",
+            //             size: item.size,
+            //             url: item.url,
+            //             proxy_url: item.proxyURL,
+            //         })
+            //     );
+            // } catch (err) {
+            //     console.error(err);
+            // }
+        }
+
+        for (const outId of m[message.channelId]) {
+            const webhook = webhookMap[outId];
+            if (!webhook) {
+                continue;
             }
+
+            const res = await webhook.send({
+                content: message.content,
+                files: attachments,
+                username: message.author.username,
+                avatarURL: message.author.avatarURL() ?? "",
+                embeds: message.embeds,
+            });
+            console.log(res);
         }
     }
 };
