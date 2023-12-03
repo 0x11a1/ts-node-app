@@ -5,14 +5,26 @@ import {
     MessageEmbed,
     Snowflake,
 } from "discord.js-selfbot-v13";
-import {conf, webhookMap} from "./conf";
 import {formatSize} from "@/utils";
+import {isListening} from "./isListening";
+import {webhookSend} from "./webhook";
+import {setCache} from "@/discord/cacheHelper";
 
 export const onMessageCreate = async (message: Message) => {
-    if (!(message.guildId && message.channelId && conf.inChannels.includes(message.channelId))) {
+    if (!isListening(message)) {
         return;
     }
-
+    try {
+        const res = await webhookSend(message);
+        if (res) {
+            const [cid, id] = res;
+            setCache(message.channelId, message.id, cid, id);
+            console.log("👍👍👍 message create success");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+    /*
     let render = "";
     render += message.content;
     const [strEmbeds, embedImages] = handleEmbeds(message.embeds);
@@ -23,34 +35,7 @@ export const onMessageCreate = async (message: Message) => {
 
     if (strAttachments.length != 0) render += strAttachments.join("");
     const images = embedImages.concat(attachImages);
-    console.log(render);
-    await webhookSend(message);
-};
-
-const webhookSend = async (message: Message) => {
-    const attachments = message.attachments.map((item) => item);
-
-    for (const m of conf.inOut) {
-        if (!m.hasOwnProperty(message.channelId)) {
-            continue;
-        }
-
-        for (const outId of m[message.channelId]) {
-            const webhook = webhookMap[outId];
-            if (!webhook) {
-                continue;
-            }
-
-            const res = await webhook.send({
-                content: message.content,
-                files: attachments,
-                username: message.author.globalName ?? message.author.username,
-                avatarURL: message.author.avatarURL() ?? "",
-                embeds: message.embeds,
-            });
-            console.log(res);
-        }
-    }
+     */
 };
 
 const handleAttachments = (
@@ -75,7 +60,7 @@ const handleAttachments = (
 const handleEmbeds = (embeds: MessageEmbed[]): [string[], string[]] => {
     const images: string[] = [];
     const strEmbeds = embeds.map((embed: MessageEmbed) => {
-        let stringEmbed = "Embed:\n";
+        let stringEmbed = "\nEmbed🩹:\n";
 
         if (embed.title) stringEmbed += `  Title: ${embed.title}\n`;
         if (embed.description) stringEmbed += `  Description: ${embed.description}\n`;

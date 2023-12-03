@@ -10,7 +10,7 @@ export interface Config {
     inChannels: string[];
     outChannels: string[];
     tokenEnvName: string;
-    cache: LRUCache<string, string>;
+    cache?: LRUCache<string, string>;
 }
 
 export let conf: Config = {
@@ -19,7 +19,6 @@ export let conf: Config = {
     inChannels: [],
     outChannels: [],
     tokenEnvName: "",
-    cache: new LRUCache({max: 1000}),
 };
 
 export const webhookMap: Record<string, Webhook> = {};
@@ -38,6 +37,7 @@ export function getConfig(): Config {
             .join()
             .split(",");
         conf.outChannels = outChannels.filter((item, index) => outChannels.indexOf(item) === index);
+        conf.cache = new LRUCache({max: 2000});
         conf.isSet = true;
         return conf;
     }
