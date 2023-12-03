@@ -7,33 +7,27 @@ import {
 } from "discord.js-selfbot-v13";
 import {conf, webhookMap} from "./conf";
 import {formatSize} from "@/utils";
-import {SocksProxyAgent} from "socks-proxy-agent";
-import superagent from "superagent";
-import dayjs from "dayjs";
 
 export const onMessageCreate = async (message: Message) => {
-    if (message.guildId && message.channelId && conf.inChannels.includes(message.channelId)) {
-        let render = "";
-        render += message.content;
-        const [strEmbeds, embedImages] = handleEmbeds(message.embeds);
-
-        if (strEmbeds.length != 0) render += strEmbeds.join("");
-
-        const [strAttachments, attachImages] = handleAttachments(message.attachments);
-
-        if (strAttachments.length != 0) render += strAttachments.join("");
-        const images = embedImages.concat(attachImages);
-        console.log(render);
-        webhookSend(message);
+    if (!(message.guildId && message.channelId && conf.inChannels.includes(message.channelId))) {
+        return;
     }
+
+    let render = "";
+    render += message.content;
+    const [strEmbeds, embedImages] = handleEmbeds(message.embeds);
+
+    if (strEmbeds.length != 0) render += strEmbeds.join("");
+
+    const [strAttachments, attachImages] = handleAttachments(message.attachments);
+
+    if (strAttachments.length != 0) render += strAttachments.join("");
+    const images = embedImages.concat(attachImages);
+    console.log(render);
+    await webhookSend(message);
 };
 
 const webhookSend = async (message: Message) => {
-    // const attachments: MessageAttachment[] = [];
-    // for (const item of message.attachments.values()) {
-    //     attachments.push(item);
-    // }
-
     const attachments = message.attachments.map((item) => item);
 
     for (const m of conf.inOut) {

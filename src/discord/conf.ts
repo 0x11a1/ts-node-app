@@ -1,5 +1,6 @@
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {Webhook} from "discord.js-selfbot-v13";
+import {LRUCache} from "lru-cache";
 
 export interface Config {
     isSet: boolean;
@@ -9,6 +10,7 @@ export interface Config {
     inChannels: string[];
     outChannels: string[];
     tokenEnvName: string;
+    cache: LRUCache<string, string>;
 }
 
 export let conf: Config = {
@@ -17,6 +19,7 @@ export let conf: Config = {
     inChannels: [],
     outChannels: [],
     tokenEnvName: "",
+    cache: new LRUCache({max: 1000}),
 };
 
 export const webhookMap: Record<string, Webhook> = {};

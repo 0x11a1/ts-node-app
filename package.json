@@ -18,6 +18,7 @@
         "discord.js-selfbot-v13": "^2.15.0",
         "dotenv": "^16.3.1",
         "https-proxy-agent": "^7.0.2",
+        "lru-cache": "^10.1.0",
         "mysql2": "^3.6.5",
         "node-global-proxy": "^1.0.1",
         "socks-proxy-agent": "^8.0.2",
