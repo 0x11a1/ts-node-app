@@ -17,7 +17,7 @@ export const IMG_SRC: Record<string, Record<string, string>> = {
         ["eth"]: "https://arweave.net/6dlNT9F0E6L54YKrb7DQYVvLgtHzrX_LdYbVNTHaELA",
         ["filecoin"]: "https://arweave.net/W_EFrGoYDlzP-Nu0-w4tfaZl2q3-2QSk0aRnJ1Y2ovM",
         ["arweave"]: "https://arweave.net/OQfzwZk-vFt0B8cAeogFC8dp9SB2ukosI1njCsbZRbo",
-        ["uni"]: "https://arweave.net/-HUCsK3tRVhi1bsFcDEosPWVTTLKGttPRO9aayG6gYI",
+        ["uni"]: "https://arweave.net/JMImfQsPOZStjAtP7Wmv_2vGHUNZLdUPdmoneeSnjeo",
     },
     ["comm"]: {
         ["小屋花草"]: "https://arweave.net/kwSHqK-_3WgKwWtjZQE8vOLuojGRiJ2KFymZPv1-_JM",
