@@ -4,6 +4,6 @@ import {kai} from "@/_4everland/kai";
 //     console.log(d);
 // });
 
-// ping("bytes");
-kai("bytes").then();
+// guan("bytes");
+// kai("bytes").then();
 // listBuckets();

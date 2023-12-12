@@ -8,6 +8,8 @@
     "license": "ISC",
     "scripts": {
         "discord": "ts-node src/discord",
+        "kai": "ts-node main/kai",
+        "guan": "ts-node main/guan",
         "dev": "ts-node",
         "build": "tsc"
     },

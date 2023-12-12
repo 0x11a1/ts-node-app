@@ -19,7 +19,7 @@ export const onReady = async (client: Client) => {
             }
             if (!webhookMap.hasOwnProperty(channel.id)) {
                 webhookMap[channel.id] = await channel.createWebhook("nodejs_" + dayjs().unix(), {
-                    avatar: IMG_SRC["nodejs"][0],
+                    avatar: IMG_SRC["dev"]["nodejs"],
                 });
             }
         } else {

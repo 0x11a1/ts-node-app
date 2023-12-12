@@ -5,10 +5,11 @@ import {HeadObjectCommandOutput} from "@aws-sdk/client-s3";
 import {Types} from "@/_4everland/types";
 import {IMG_SRC} from "@/consts/imgSrc";
 import dayjs from "dayjs";
-export const ping = async (bucketName: string) => {
+
+export const guan = async (bucketName: string) => {
     const conn = await mysql.createConnection(config);
     const [rows] = await conn.execute<mysql.RowDataPacket[]>(
-        `select * from bite_jun where name = 'okxSwapTx' AND algo_cl_ord_id is not null AND state = 4 AND close_avg_px > 0 AND up_state = 1;`
+        `select * from okx_algo where cl_ord_id is not null and algo_cl_ord_id is not null AND state = 4 AND close_avg_px > 0 AND up_state = 1 order by id;`
     );
 
     if (rows.length > 0) {
@@ -17,8 +18,12 @@ export const ping = async (bucketName: string) => {
         let obj: HeadObjectCommandOutput;
         try {
             obj = await s3.headObject({Bucket: bucketName, Key: dd.algo_cl_ord_id});
-            if (obj && obj.Metadata && (obj.Metadata["ipfs-hash"] !== "" || obj.Metadata["arweave-hash"] !== "")) {
-                await conn.execute(`update bite_jun set up_state = 4 where id = ${dd.id};`);
+            if (
+                obj &&
+                obj.Metadata &&
+                (obj.Metadata["ipfs-hash"] !== "" || obj.Metadata["arweave-hash"] !== "")
+            ) {
+                await conn.execute(`update okx_algo set up_state = 4 where id = ${dd.id};`);
                 conn.end().then();
                 return;
             }
@@ -40,34 +45,40 @@ export const ping = async (bucketName: string) => {
                 side += "平空🪂";
             }
 
-            const earn = Number(dd.earn);
-            const ratio = Number(dd.pnl_ratio) * 100;
-            let earnTxt: string;
+            const realizedPnl = Number(dd.realized_pnl);
+            const ratio = Number(dd.pnl_ratio) * 100; //平仓收益率
+            const fee = dd.fee; //累计手续费金额，正数代表平台返佣 ，负数代表平台扣除
+            const fundingFee = dd.funding_fee;
+            let realizedPnlTxt: string;
 
-            if (earn > 0) {
-                earnTxt = `📈${earn.toFixed(1)}(${ratio.toFixed(2)}%)`;
+            if (realizedPnl > 0) {
+                realizedPnlTxt = `📈${realizedPnl.toFixed(1)}(${ratio.toFixed(2)}%)`;
             } else {
-                earnTxt = `📉${earn.toFixed(1)}(${ratio.toFixed(2)}%)`;
+                realizedPnlTxt = `📉${realizedPnl.toFixed(1)}(${ratio.toFixed(2)}%)`;
             }
 
             const content =
                 `币种:${symbol}\n` +
                 `交易方向:${side}\n` +
                 `平仓均价:💲${dd.close_avg_px}\n` +
-                `本单收益:${earnTxt}\n` +
+                `已实现收益:${realizedPnlTxt}\n` +
+                `累计手续费金额:${fee}\n` +
+                `累计资金费用:${fundingFee}\n` +
                 "＿＿＿＿＿＿＿🦄️🦄️🦄＿＿＿＿＿＿＿\n" +
                 "止盈止损会随后台策略实时修改❗\n" +
-                "账户初始资金:💲1200\n" +
+                // "账户初始资金:💲1200\n" +
                 "仅供学习参考，不构成投资建议❗\n" +
                 "在区块链上记录每一笔交易🐸";
-
+            const avatarKey = Object.keys(IMG_SRC["avatar"])[
+                Math.floor(Math.random() * Object.keys(IMG_SRC["avatar"]).length)
+            ];
             const data: Types = {
                 id: dd.algo_cl_ord_id,
                 pid: dd.cl_ord_id,
-                symbol: IMG_SRC[symbol.toLowerCase()][0],
+                symbol: IMG_SRC["coin"][symbol.toLowerCase()],
                 title: title,
-                author: "0x666",
-                avatar: IMG_SRC["avatar"][0],
+                author: "0x11a1",
+                avatar: IMG_SRC["avatar"][avatarKey],
                 content: content,
                 timestamp: dayjs(dd.pos_update_time).unix(),
                 secretKey: "",

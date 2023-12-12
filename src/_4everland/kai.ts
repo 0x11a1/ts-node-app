@@ -5,10 +5,11 @@ import {HeadObjectCommandOutput} from "@aws-sdk/client-s3";
 import {Types} from "@/_4everland/types";
 import {IMG_SRC} from "@/consts/imgSrc";
 import dayjs from "dayjs";
+
 export const kai = async (bucketName: string) => {
     const conn = await mysql.createConnection(config);
     const [rows] = await conn.execute<mysql.RowDataPacket[]>(
-        `select * from bite_jun where name = 'okxSwapTx' AND cl_ord_id is not null AND state = 1 AND close_avg_px > 0 AND up_state = 0;`
+        `select * from okx_algo where cl_ord_id is not null AND state = 1 AND avg_px > 0 AND up_state = 0 order by id;`
     );
     if (rows.length > 0) {
         const dd: any = rows[0];
@@ -16,8 +17,12 @@ export const kai = async (bucketName: string) => {
         let obj: HeadObjectCommandOutput;
         try {
             obj = await s3.headObject({Bucket: bucketName, Key: dd.cl_ord_id});
-            if (obj && obj.Metadata && (obj.Metadata["ipfs-hash"] !== "" || obj.Metadata["arweave-hash"] !== "")) {
-                await conn.execute(`update bite_jun set up_state = 4 where id = ${dd.id};`);
+            if (
+                obj &&
+                obj.Metadata &&
+                (obj.Metadata["ipfs-hash"] !== "" || obj.Metadata["arweave-hash"] !== "")
+            ) {
+                await conn.execute(`update okx_algo set up_state = 1 where id = ${dd.id};`);
                 conn.end().then();
                 return;
             }
@@ -46,23 +51,25 @@ export const kai = async (bucketName: string) => {
                 `止盈:${dd.tp_trigger_px}\n` +
                 `止损:${dd.sl_trigger_px}\n` +
                 `杠杆:X${dd.lever}\n` +
-                `本单花费:🍥${Number(dd.cost).toFixed(1)}\n` +
-                `开单前账户可用余额:💰${Number(dd.bal).toFixed(1)}\n` +
+                `本单花费:💰${Number(dd.cost).toFixed(1)}\n` +
+                // `开单前账户可用余额:💰${Number(dd.bal).toFixed(1)}\n` +
                 "＿＿＿＿＿＿＿🦄️🦄️🦄＿＿＿＿＿＿＿\n" +
                 "止盈止损会随后台策略实时修改❗\n" +
-                "账户初始资金:💲1200\n" +
+                // "账户初始资金:💲1200\n" +
                 "仅供学习参考，不构成投资建议❗\n" +
                 "在区块链上记录每一笔交易🐸";
-
+            const avatarKey = Object.keys(IMG_SRC["avatar"])[
+                Math.floor(Math.random() * Object.keys(IMG_SRC["avatar"]).length)
+            ];
             const data: Types = {
                 id: dd.cl_ord_id,
                 pid: "",
-                symbol: IMG_SRC[symbol.toLowerCase()][0],
+                symbol: IMG_SRC["coin"][symbol.toLowerCase()],
                 title: title,
-                author: "0x666",
-                avatar: IMG_SRC["avatar"][0],
+                author: "0x11a1",
+                avatar: IMG_SRC["avatar"][avatarKey],
                 content: content,
-                timestamp: dayjs(dd.pos_update_time).unix(),
+                timestamp: dayjs(dd.created_at).unix(),
                 secretKey: "",
             };
 
