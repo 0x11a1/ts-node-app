@@ -7,11 +7,11 @@
     "author": "",
     "license": "ISC",
     "scripts": {
-        "discord": "ts-node src/discord",
-        "kai": "ts-node main/kai",
-        "guan": "ts-node main/guan",
         "dev": "ts-node",
-        "build": "tsc"
+        "build": "tsc",
+        "discord": "ts-node src/discord",
+        "kai": "ts-node dist/main/kai.js",
+        "guan": "ts-node dist/main/guan.js"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.465.0",
